@@ -1,11 +1,366 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<script>
-		alert('Hello World..!');
-	</script>
-</head>
-<body>
-
-</body>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		
+		<title>Ext JS Grid Example</title>
+		
+		<script src="http://cdn.sencha.io/ext-4.0.7-gpl/ext-all.js"> </script>
+		
+		<link rel="stylesheet" href="http://cdn.sencha.io/ext-4.0.7-gpl/resources/css/ext-all.css" />
+		
+		<style>
+			.add-button {
+				background-image: url("http://cdn.sencha.io/ext-4.0.7-gpl/examples/shared/icons/fam/add.gif") !important;
+			}
+			
+			.delete-button {
+				background-image: url("http://cdn.sencha.io/ext-4.0.7-gpl/examples/shared/icons/fam/delete.gif") !important;
+			}
+			
+			.ux-filtered-column {
+				font-style: italic;
+				font-weight: bold;
+			}
+			
+			.x-spotlight {
+				background-color: #ccc;
+				
+				z-index: 8999;
+				position: absolute;
+				top: 0;
+				left: 0;
+				-moz-opacity: 0.5;
+				opacity: .50;
+				filter: alpha(opacity=50);
+				width: 0;
+				height: 0;
+				zoom: 1;
+			}
+		</style>
+		
+		<script>
+			Ext.Loader.setConfig({enabled: true});
+			Ext.Loader.setPath("Ext.ux", "http://cdn.sencha.io/ext-4.0.7-gpl/examples/ux");
+			Ext.require([
+				"*",
+				"Ext.ux.Spotlight",
+				"Ext.ux.grid.FiltersFeature"
+			]);
+			
+			Ext.onReady(function() {
+				Ext.QuickTips.init();
+				
+				// CellEditing broken with grid.reconfigure(), which is used when adding columns.
+				// See http://www.sencha.com/forum/showthread.php?131583-OPEN-EXTJSIV-1789-4.0.0-Cannot-edit-cells-after-grid-reconfigure
+				// If it weren't broken, then inline editing would be possible in this example.
+				var cellEditing = Ext.create("Ext.grid.plugin.CellEditing");
+				
+				var filters = {
+					ftype: "filters",
+					local: true
+				};
+				
+				var detailPanelDefaultItems = {
+					html: "Double-click a record for details."
+				};
+				
+				var spot = Ext.create("Ext.ux.Spotlight");
+				
+				var tip = {
+					target: "add-column-button",
+					anchor: "top",
+					anchorOffset: 10,
+					html: "Click me to begin."
+				};
+				
+				Ext.create("Ext.Viewport", {
+					layout: {
+						type: "border",
+						padding: 5
+					},
+					listeners: {
+						afterrender: function() {
+							spot.show("add-column-button");
+							
+							tip = Ext.create('Ext.tip.ToolTip', tip);
+							tip.show();
+						}
+					},
+					items: [
+						{
+							region: "center",
+							id:     "gridPanel",
+							title:  "Example Grid",
+							tbar: [
+								{
+									xtype: "button",
+									id: "add-column-button",
+									text: "Add Column",
+									iconCls: "add-button",
+									tooltip: "Add a column to the grid.",
+									handler: function() {
+										var grid = this.up("grid");
+										var store = grid.getStore();
+										var fields = store.model.prototype.fields;
+										
+										if (spot.active) {
+											spot.hide();
+											tip.hide();
+											tip.destroy();
+										}
+										
+										Ext.MessageBox.prompt("Specify Column Name", "Column Name", function(button, columnName) {
+											if (button == "ok") {
+												if (fields.indexOfKey(columnName) == -1) {
+													// add column to list of known fields
+													fields.add(Ext.create("Ext.data.Field", {
+														name: columnName
+													}));
+													
+													// add column to existing records so sorting and filtering work correctly
+													// desired value can be added with detail panel
+													for (var i = 0; i < store.data.items.length; i++) {
+														store.data.items[i].data[columnName] = "";
+													}
+													
+													var columnModel = [];
+													for (var i = 0; i < fields.keys.length; i++) {
+														var currColumnName = fields.keys[i];
+														columnModel.push({
+															header:     currColumnName,
+															dataIndex:  currColumnName,
+															filterable: true
+														});
+													}
+													
+													grid.reconfigure(null, columnModel);
+												} else {
+													Ext.MessageBox.alert("Column Name Already Exists", "A column named &ldquo;" + columnName + "&rdquo; already exists. Please specify a different column name.");
+												}
+											}
+										});
+									}
+								},
+								{
+									xtype: "button",
+									text: "Add Record",
+									iconCls: "add-button",
+									tooltip: "Add a record to the grid.",
+									handler: function() {
+										var grid = this.up("grid");
+										var store = grid.getStore();
+										var fields = store.model.prototype.fields;
+										
+										if (fields.length == 0) {
+											Ext.MessageBox.alert("No Columns Defined", "You have not added any columns to the grid. Please add some columns and then try adding records.");
+										} else {
+											var formFields = [];
+											
+											for (var i = 0; i < fields.keys.length; i++) {
+												var currColumnName = fields.keys[i];
+												formFields.push({
+													fieldLabel: currColumnName,
+													name:       currColumnName
+												});
+											}
+											
+											var win = Ext.create("Ext.window.Window", {
+												title: "New Record",
+												bodyStyle: "padding: 5px",
+												closable: true,
+												modal: true,
+												items: {
+													xtype: "form",
+													defaultType: "textfield",
+													fieldDefaults: {
+														labelWidth: 75
+													},
+													items: formFields,
+													buttons: [
+														{
+															text: "Add Record",
+															id: "new-record-add-button",
+															handler: function() {
+																var form = this.up("form").getForm();
+																if (form.isValid()) {
+																	store.add(form.getValues());
+																	
+																	// Reconfigure needed (instead of view refresh) for filtering
+																	// 
+																	// From http://docs.sencha.com/ext-js/4-0/#!/api/Ext.ux.grid.FiltersFeature:
+																	// Automatic Reconfiguration: Filters automatically reconfigure when the grid 'reconfigure' event fires.
+																	// 
+																	// NOTE: Automatic Reconfiguration does not seem to work as of Ext JS 4.0.7. If a filter is applied, and
+																	// then a record is added with a filter-column value that doesn't match the filter, the record shows up
+																	// in the grid. If the filter is manually disabled and re-enabled, then the record (correctly) disappears.
+																	grid.reconfigure();
+																	
+																	this.up("window").close();
+																}
+															}
+														},
+														{
+															text: "Cancel",
+															handler: function() {
+																this.up("window").close();
+															}
+														}
+													],
+													listeners: {
+														afterrender: function() {
+															var that = this;
+															setTimeout(function() {
+																that.items.first().focus();
+															}, 750);
+															
+															this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {
+																enter: function() {
+																	Ext.getCmp("new-record-add-button").handler();
+																},
+																scope: this
+															});
+														}
+													}
+												}
+											});
+											
+											win.show();
+										}
+									}
+								},
+								{
+									xtype: "button",
+									text: "Remove Record(s)",
+									iconCls: "delete-button",
+									tooltip: "Remove one or more selected records from the grid.<br /><br />(Hold Ctrl or Shift key to select more than one record.)",
+									handler: function() {
+										var grid = this.up("grid");
+										var store = grid.getStore();
+										
+										if (grid.getSelectionModel().getCount() == 0) {
+											Ext.MessageBox.alert("No Records Selected", "You have not selected any records for removal. Please select one or more records and try again.");
+										} else {
+											store.remove(grid.getSelectionModel().getSelection());
+											grid.reconfigure();
+										}
+									}
+								}
+							],
+							xtype: "grid",
+							layout: "fit",
+							selModel: {
+								mode: "MULTI"
+							},
+							defaults: {
+								editor: "textfield"
+							},
+							store: {
+								fields: [],
+								data: {"items": []},
+								proxy: {
+									type: "memory",
+									reader: {
+										type: "json",
+										root: "items"
+									}
+								}
+							},
+							columns: [],
+							stripeRows: true,
+							plugins: [cellEditing],
+							features: [filters],
+							viewConfig: {
+								listeners: {
+									itemdblclick: function(view, record, item, index, e, eOpts) {
+										var grid = this.up("grid");
+										var detailPanel = Ext.getCmp("detailPanel");
+										var resetDetailPanel = function() {
+											if (spot.active) {
+												spot.hide();
+											}
+											
+											detailPanel.removeAll();
+											detailPanel.add(detailPanelDefaultItems);
+											detailPanel.collapse();
+											grid.getSelectionModel().deselectAll();
+										};
+										
+										var formFields = [];
+										for (var key in record.data) {
+											formFields.push({
+												fieldLabel: key,
+												name: key
+											});
+										}
+										
+										detailPanel.expand();
+										
+										detailPanel.removeAll();
+										detailPanel.add({
+											xtype: "form",
+											defaultType: "textfield",
+											fieldDefaults: {
+												labelWidth: 75
+											},
+											items: formFields,
+											buttons: [
+												{
+													text: "Save Record",
+													id: "record-save-button",
+													handler: function() {
+														var form = this.up("form").getForm();
+														if (form.isValid()) {
+															record.set(form.getValues());
+															record.commit();
+															
+															view.refresh();
+															
+															resetDetailPanel();
+														}
+													}
+												},
+												{
+													text: "Cancel",
+													handler: resetDetailPanel
+												}
+											],
+											listeners: {
+												afterrender: function() {
+													this.loadRecord(record);
+													
+													this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {
+														enter: function() {
+															Ext.getCmp("record-save-button").handler();
+														},
+														scope: this
+													});
+													
+													spot.show(this.up("panel").id);
+												}
+											}
+										});
+									}
+								}
+							}
+						},
+						{
+							region:      "east",
+							id:          "detailPanel",
+							title:       "Details",
+							width:       250,
+							split:       true,
+							collapsible: true,
+							collapsed:   true,
+							layout:      "fit",
+							bodyStyle:   "border: 0",
+							items:       detailPanelDefaultItems
+						}
+					]
+				});
+			});
+		</script>
+	</head>
+	<body>
+	</body>
 </html>
