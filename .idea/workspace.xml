@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2a74b930-9f76-4a8b-976d-2d2c6632607c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/INSIDE_JavaScript/hello_javascript.js" beforeDir="false" afterPath="$PROJECT_DIR$/INSIDE_JavaScript/hello_javascript.js" afterDir="false" />
-    </list>
+    <list default="true" id="2a74b930-9f76-4a8b-976d-2d2c6632607c" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -113,16 +111,15 @@
       <option name="presentableId" value="Default" />
       <updated>1542073429739</updated>
       <workItem from="1542073434241" duration="68000" />
-      <workItem from="1542720161808" duration="5165000" />
+      <workItem from="1542720161808" duration="5764000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5233000" />
+    <option name="totallyTimeSpent" value="5832000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="953" y="0" width="974" height="1047" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25213677" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
