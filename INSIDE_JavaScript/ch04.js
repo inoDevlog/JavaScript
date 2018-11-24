@@ -20,3 +20,9 @@ var minus = function (x, y) {
 };
 
 console.log(minus(7,4));
+
+var multiple = function ( x, y, z) {
+    return x * y * z;
+};
+
+console.log(multiple(5, 6, 10));
