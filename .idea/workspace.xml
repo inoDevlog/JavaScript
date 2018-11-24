@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2a74b930-9f76-4a8b-976d-2d2c6632607c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/INSIDE_JavaScript/ch04.js" beforeDir="false" afterPath="$PROJECT_DIR$/INSIDE_JavaScript/ch04.js" afterDir="false" />
-    </list>
+    <list default="true" id="2a74b930-9f76-4a8b-976d-2d2c6632607c" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -145,12 +143,12 @@
       <workItem from="1542720161808" duration="5764000" />
       <workItem from="1542802508170" duration="3071000" />
       <workItem from="1542894535515" duration="1500000" />
-      <workItem from="1543067556774" duration="662000" />
+      <workItem from="1543067556774" duration="674000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11065000" />
+    <option name="totallyTimeSpent" value="11077000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="0" width="974" height="1047" extended-state="0" />
