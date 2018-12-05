@@ -18,11 +18,9 @@ console.log(add(3,4));
 var minus = function (x, y) {
     return x - y;
 };
-
 console.log(minus(7,4));
 
 var multiple = function ( x, y, z) {
     return x * y * z;
 };
-
 console.log(multiple(5, 6, 10));
