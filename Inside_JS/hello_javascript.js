@@ -35,7 +35,6 @@ var add = function sum(x, y) {
     return x + y;
 };
 console.log(add(3,4));
-console.log(sum(3,4));
 
 var factorialVar = function factorial(n) {
     if(n <= 1) {
@@ -44,7 +43,19 @@ var factorialVar = function factorial(n) {
     return n * factorial(n-1);
 };
 console.log(factorialVar(3));
-console.log(factorial(3));
 
 var add = new Function('x', 'y', 'return x + y');
 console.log(add(3, 4));
+
+addd(2,3);
+function addd(x, y) {
+    return x + y;
+}
+addd(3,4);
+
+add(2, 3);
+
+var add = function (x, y) {
+    return x + y;
+};
+add(3, 4);
